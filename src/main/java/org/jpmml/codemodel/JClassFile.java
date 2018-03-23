@@ -13,8 +13,10 @@ public class JClassFile extends JResourceFile {
 	private byte[] bytes = null;
 
 
-	public JClassFile(String name){
+	public JClassFile(String name, byte[] bytes){
 		super(name);
+
+		setBytes(bytes);
 	}
 
 	@Override
@@ -28,7 +30,7 @@ public class JClassFile extends JResourceFile {
 		return this.bytes;
 	}
 
-	public void setBytes(byte[] bytes){
+	private void setBytes(byte[] bytes){
 		this.bytes = bytes;
 	}
 }

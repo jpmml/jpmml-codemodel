@@ -71,6 +71,7 @@ public class CompilerUtil {
 
 		for(ByteArrayClassFileObject classObject : classObjects){
 			String name = classObject.getName();
+			byte[] bytes = classObject.toByteArray();
 
 			// Convert URI absolute path to relative path
 			if(name.startsWith("/")){
@@ -90,8 +91,7 @@ public class CompilerUtil {
 				_package = codeModel.rootPackage();
 			}
 
-			JClassFile classFile = new JClassFile(name);
-			classFile.setBytes(classObject.toByteArray());
+			JClassFile classFile = new JClassFile(name, bytes);
 
 			_package.addResourceFile(classFile);
 		}
