@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import com.google.common.io.ByteStreams;
 import com.sun.codemodel.JResourceFile;
 
-public class JDirectFile extends JResourceFile {
+public class JDirectFile extends JResourceFile implements Streamable {
 
 	private File file = null;
 
@@ -25,13 +25,19 @@ public class JDirectFile extends JResourceFile {
 
 	@Override
 	public void build(OutputStream os) throws IOException {
-		File file = getFile();
 
-		try(InputStream is = new FileInputStream(file)){
+		try(InputStream is = getInputStream()){
 			ByteStreams.copy(is, os);
 		}
 
 		os.flush();
+	}
+
+	@Override
+	public InputStream getInputStream() throws IOException {
+		File file = getFile();
+
+		return new FileInputStream(file);
 	}
 
 	public File getFile(){

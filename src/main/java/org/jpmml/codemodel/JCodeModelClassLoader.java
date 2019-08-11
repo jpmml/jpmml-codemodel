@@ -107,6 +107,13 @@ public class JCodeModelClassLoader extends ClassLoader {
 
 					@Override
 					public InputStream getInputStream() throws IOException {
+
+						if(resourceFile instanceof Streamable){
+							Streamable streamable = (Streamable)resourceFile;
+
+							return streamable.getInputStream();
+						}
+
 						byte[] bytes;
 
 						try {
