@@ -23,6 +23,11 @@ public class ArchiverUtil {
 		Attributes attributes = manifest.getMainAttributes();
 		attributes.putValue("Manifest-Version", "1.0");
 
+		archive(manifest, codeModel, os);
+	}
+
+	static
+	public void archive(Manifest manifest, JCodeModel codeModel, OutputStream os) throws IOException {
 		CodeWriter zipWriter = new JarCodeWriter(os, manifest);
 
 		codeModel.build(zipWriter);
