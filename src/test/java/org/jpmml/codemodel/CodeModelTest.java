@@ -35,7 +35,7 @@ public class CodeModelTest {
 		File file = File.createTempFile("codemodel", ".jar");
 
 		try(OutputStream os = new FileOutputStream(file)){
-			ArchiverUtil.archive(os, codeModel);
+			ArchiverUtil.archive(codeModel, os);
 		}
 
 		try(JarFile jarFile = new JarFile(file)){

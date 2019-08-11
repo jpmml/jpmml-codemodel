@@ -17,7 +17,7 @@ public class ArchiverUtil {
 	}
 
 	static
-	public void archive(OutputStream os, JCodeModel codeModel) throws IOException {
+	public void archive(JCodeModel codeModel, OutputStream os) throws IOException {
 		Manifest manifest = new Manifest();
 
 		Attributes attributes = manifest.getMainAttributes();
