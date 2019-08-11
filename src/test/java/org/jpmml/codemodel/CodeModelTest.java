@@ -6,6 +6,7 @@ package org.jpmml.codemodel;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -19,13 +20,14 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class CodeModelTest {
 
 	@Test
-	public void compileAndPackage() throws Exception {
+	public void compileAndArchive() throws Exception {
 		JCodeModel codeModel = new JCodeModel();
 
 		generateExampleApplication(codeModel, "example.Main");
@@ -54,6 +56,23 @@ public class CodeModelTest {
 		boolean success = file.delete();
 
 		assertTrue(success);
+	}
+
+	@Test
+	public void compileAndLoad() throws Exception {
+		JCodeModel codeModel = new JCodeModel();
+
+		generateExampleApplication(codeModel, "example.Main");
+
+		CompilerUtil.compile(codeModel);
+
+		ClassLoader classLoader = new JCodeModelClassLoader(codeModel);
+
+		Class<?> clazz = classLoader.loadClass("example.Main");
+		assertEquals("example.Main", clazz.getName());
+
+		URL classResource = classLoader.getResource("example/Main.class");
+		assertNotNull(classResource);
 	}
 
 	static
