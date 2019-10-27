@@ -22,6 +22,7 @@ import javax.tools.ToolProvider;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.io.ByteStreams;
 import com.google.common.reflect.ClassPath;
 import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JCodeModel;
@@ -51,8 +52,9 @@ public class CompilerUtil {
 		List<ByteArrayClassFileObject> classObjects = new ArrayList<>();
 
 		CodeWriter sourceWriter = createSourceObjectCodeWriter(sourceObjects);
+		CodeWriter resourceWriter = createResourceCodeWriter();
 
-		codeModel.build(sourceWriter);
+		codeModel.build(sourceWriter, resourceWriter);
 
 		boolean success;
 
@@ -133,6 +135,23 @@ public class CompilerUtil {
 				sourceObjects.add(this.sourceObject);
 
 				this.sourceObject = null;
+			}
+		};
+
+		return codeWriter;
+	}
+
+	static
+	private CodeWriter createResourceCodeWriter(){
+		CodeWriter codeWriter = new CodeWriter(){
+
+			@Override
+			public OutputStream openBinary(JPackage _package, String name){
+				return ByteStreams.nullOutputStream();
+			}
+
+			@Override
+			public void close(){
 			}
 		};
 
