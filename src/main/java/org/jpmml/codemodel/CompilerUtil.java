@@ -35,19 +35,23 @@ public class CompilerUtil {
 
 	static
 	public void compile(JCodeModel codeModel) throws IOException {
-		ClassLoader classLoader = (Thread.currentThread()).getContextClassLoader();
-
-		compile(codeModel, classLoader);
-	}
-
-	static
-	public void compile(JCodeModel codeModel, ClassLoader classLoader) throws IOException {
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-
 		if(compiler == null){
 			throw new IOException();
 		}
 
+		compile(codeModel, compiler);
+	}
+
+	static
+	public void compile(JCodeModel codeModel, JavaCompiler compiler) throws IOException {
+		ClassLoader classLoader = (Thread.currentThread()).getContextClassLoader();
+
+		compile(codeModel, compiler, classLoader);
+	}
+
+	static
+	public void compile(JCodeModel codeModel, JavaCompiler compiler, ClassLoader classLoader) throws IOException {
 		List<StringSourceFileObject> sourceObjects = new ArrayList<>();
 		List<ByteArrayClassFileObject> classObjects = new ArrayList<>();
 
