@@ -13,6 +13,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import com.sun.codemodel.ClassType;
+import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
@@ -41,7 +42,9 @@ public class CodeModelTest {
 		try(OutputStream os = new FileOutputStream(file)){
 			Manifest manifest = ArchiverUtil.createManifest();
 
-			ArchiverUtil.archive(manifest, codeModel, os);
+			CodeWriter codeWriter = new JarCodeWriter(os, manifest);
+
+			codeModel.build(codeWriter);
 		}
 
 		try(JarFile jarFile = new JarFile(file)){

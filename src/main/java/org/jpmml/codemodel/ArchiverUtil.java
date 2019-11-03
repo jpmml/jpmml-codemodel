@@ -3,13 +3,8 @@
  */
 package org.jpmml.codemodel;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
-import com.sun.codemodel.CodeWriter;
-import com.sun.codemodel.JCodeModel;
 
 public class ArchiverUtil {
 
@@ -35,12 +30,5 @@ public class ArchiverUtil {
 		}
 
 		return manifest;
-	}
-
-	static
-	public void archive(Manifest manifest, JCodeModel codeModel, OutputStream os) throws IOException {
-		CodeWriter zipWriter = new JarCodeWriter(os, manifest);
-
-		codeModel.build(zipWriter);
 	}
 }
