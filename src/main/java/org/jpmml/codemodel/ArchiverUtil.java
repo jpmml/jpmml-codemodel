@@ -17,13 +17,24 @@ public class ArchiverUtil {
 	}
 
 	static
-	public void archive(JCodeModel codeModel, OutputStream os) throws IOException {
+	public Manifest createManifest(){
+		return createManifest(null);
+	}
+
+	static
+	public Manifest createManifest(Class<?> creator){
 		Manifest manifest = new Manifest();
 
-		Attributes attributes = manifest.getMainAttributes();
-		attributes.putValue("Manifest-Version", "1.0");
+		Attributes mainAttributes = manifest.getMainAttributes();
+		mainAttributes.putValue("Manifest-Version", "1.0");
 
-		archive(manifest, codeModel, os);
+		if(creator != null){
+			Package _package = creator.getPackage();
+
+			mainAttributes.putValue("Created-By", _package.getImplementationTitle() + " " + _package.getImplementationVersion());
+		}
+
+		return manifest;
 	}
 
 	static

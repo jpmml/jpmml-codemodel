@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -22,6 +23,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class CodeModelTest {
@@ -37,12 +39,18 @@ public class CodeModelTest {
 		File file = File.createTempFile("codemodel", ".jar");
 
 		try(OutputStream os = new FileOutputStream(file)){
-			ArchiverUtil.archive(codeModel, os);
+			Manifest manifest = ArchiverUtil.createManifest();
+
+			ArchiverUtil.archive(manifest, codeModel, os);
 		}
 
 		try(JarFile jarFile = new JarFile(file)){
 			Manifest manifest = jarFile.getManifest();
 			assertNotNull(manifest);
+
+			Attributes mainAttributes = manifest.getMainAttributes();
+			assertNotNull(mainAttributes.getValue("Manifest-Version"));
+			assertNull(mainAttributes.getValue("Created-By"));
 
 			JarEntry javaEntry = jarFile.getJarEntry("example/Main.java");
 			assertNotNull(javaEntry);
