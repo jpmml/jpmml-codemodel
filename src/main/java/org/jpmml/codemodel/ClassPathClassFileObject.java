@@ -5,19 +5,16 @@ package org.jpmml.codemodel;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-
-import javax.tools.SimpleJavaFileObject;
 
 import com.google.common.reflect.ClassPath;
 
-public class ClassPathClassFileObject extends SimpleJavaFileObject {
+public class ClassPathClassFileObject extends ClassFileObject {
 
 	private ClassPath.ClassInfo classInfo = null;
 
 
-	public ClassPathClassFileObject(String name, ClassPath.ClassInfo classInfo){
-		super(URI.create("classpath:///" + name), Kind.CLASS);
+	public ClassPathClassFileObject(ClassPath.ClassInfo classInfo){
+		super("classpath", classInfo.getName());
 
 		setClassInfo(classInfo);
 	}

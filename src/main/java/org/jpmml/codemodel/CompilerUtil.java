@@ -76,28 +76,18 @@ public class CompilerUtil {
 		}
 
 		for(ByteArrayClassFileObject classObject : classObjects){
-			String name = classObject.getName();
-			byte[] bytes = classObject.toByteArray();
-
-			// Convert URI absolute path to relative path
-			if(name.startsWith("/")){
-				name = name.substring(1);
-			}
+			JClassFile classFile = classObject.toClassFile();
 
 			JPackage _package;
 
-			int slash = name.lastIndexOf('/');
-			if(slash > -1){
-				_package = codeModel._package((name.substring(0, slash)).replace('/', '.'));
-
-				name = name.substring(slash + 1);
+			String packageName = classObject.getPackageName();
+			if(("").equals(packageName)){
+				_package = codeModel.rootPackage();
 			} else
 
 			{
-				_package = codeModel.rootPackage();
+				_package = codeModel._package(packageName);
 			}
-
-			JClassFile classFile = new JClassFile(name, bytes);
 
 			_package.addResourceFile(classFile);
 		}
@@ -200,7 +190,7 @@ public class CompilerUtil {
 			public JavaFileObject getJavaFileForOutput(JavaFileManager.Location location, String name, JavaFileObject.Kind kind, FileObject sibling) throws IOException {
 
 				if((JavaFileObject.Kind.CLASS).equals(kind)){
-					ByteArrayClassFileObject classObject = new ByteArrayClassFileObject(name.replace('.', '/') + ".class");
+					ByteArrayClassFileObject classObject = new ByteArrayClassFileObject(name);
 
 					classObjects.add(classObject);
 
@@ -230,7 +220,7 @@ public class CompilerUtil {
 
 				Iterable<ClassPath.ClassInfo> classInfos = Iterables.filter(classPath.getAllClasses(), filter);
 				for(ClassPath.ClassInfo classInfo : classInfos){
-					ClassPathClassFileObject classObject = new ClassPathClassFileObject((classInfo.getName()).replace('.', '/') + ".class", classInfo);
+					ClassPathClassFileObject classObject = new ClassPathClassFileObject(classInfo);
 
 					result.add(classObject);
 				}

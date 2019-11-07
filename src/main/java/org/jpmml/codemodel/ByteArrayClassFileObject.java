@@ -6,17 +6,18 @@ package org.jpmml.codemodel;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 
-import javax.tools.SimpleJavaFileObject;
-
-public class ByteArrayClassFileObject extends SimpleJavaFileObject {
+public class ByteArrayClassFileObject extends ClassFileObject {
 
 	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
 
 	public ByteArrayClassFileObject(String name){
-		super(URI.create("byte-array:///" + name), Kind.CLASS);
+		super("byte-array", name);
+	}
+
+	public JClassFile toClassFile(){
+		return new JClassFile(getSimpleName() + ".class", toByteArray());
 	}
 
 	public byte[] toByteArray(){
