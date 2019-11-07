@@ -104,7 +104,7 @@ public class CompilerUtil {
 	}
 
 	static
-	private CodeWriter createSourceObjectCodeWriter(final List<StringSourceFileObject> sourceObjects){
+	private CodeWriter createSourceObjectCodeWriter(List<StringSourceFileObject> sourceObjects){
 		CodeWriter codeWriter = new CodeWriter(){
 
 			private StringSourceFileObject sourceObject = null;
@@ -163,7 +163,7 @@ public class CompilerUtil {
 	}
 
 	static
-	private JavaFileManager createClassObjectJavaFileManager(StandardJavaFileManager standardFileManager, final ClassLoader classLoader, final List<ByteArrayClassFileObject> classObjects){
+	private JavaFileManager createClassObjectJavaFileManager(StandardJavaFileManager standardFileManager, ClassLoader classLoader, List<ByteArrayClassFileObject> classObjects){
 		JavaFileManager fileManager = new ForwardingJavaFileManager<StandardJavaFileManager>(standardFileManager){
 
 			private ClassPath classPath = null;
@@ -210,7 +210,7 @@ public class CompilerUtil {
 				return super.getJavaFileForOutput(location, name, kind, sibling);
 			}
 
-			private Collection<ClassPathClassFileObject> listClassObjects(final String packageName, final boolean recurse) throws IOException {
+			private Collection<ClassPathClassFileObject> listClassObjects(String packageName, boolean recurse) throws IOException {
 				List<ClassPathClassFileObject> result = new ArrayList<>();
 
 				Predicate<ClassPath.ClassInfo> filter = new Predicate<ClassPath.ClassInfo>(){
