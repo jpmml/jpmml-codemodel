@@ -67,6 +67,14 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>ecj</artifactId>
+			<!-- see https://bugs.eclipse.org/bugs/show_bug.cgi?id=541269 -->
+			<version>3.13.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

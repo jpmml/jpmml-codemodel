@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -20,6 +21,7 @@ import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
+import org.eclipse.jdt.internal.compiler.tool.EclipseCompiler;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -64,6 +66,18 @@ public class CodeModelTest {
 			assertTrue(classEntry.getSize() > 0L);
 		}
 
+		JCodeModel derivedCodeModel = new JCodeModel();
+
+		generateDerivedExampleApplication(derivedCodeModel, "Main", "example.Main");
+
+		URL[] classpath = {
+			((file.toURI()).toURL())
+		};
+
+		try(URLClassLoader classLoader = new URLClassLoader(classpath)){
+			CompilerUtil.compile(derivedCodeModel, new EclipseCompiler(), classLoader);
+		}
+
 		boolean success = file.delete();
 
 		assertTrue(success);
@@ -97,5 +111,11 @@ public class CodeModelTest {
 		JBlock mainMethodBody = mainMethod.body();
 
 		mainMethodBody.directStatement("System.out.println(\"Hello World\");");
+	}
+
+	static
+	private void generateDerivedExampleApplication(JCodeModel codeModel, String name, String mainName) throws JClassAlreadyExistsException {
+		JDefinedClass derivedClazz = codeModel._class(JMod.PUBLIC, name, ClassType.CLASS);
+		derivedClazz._extends(codeModel.ref(mainName));
 	}
 }

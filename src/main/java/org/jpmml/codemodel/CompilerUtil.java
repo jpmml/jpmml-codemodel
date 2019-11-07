@@ -16,6 +16,7 @@ import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
+import javax.tools.JavaFileObject.Kind;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
@@ -164,7 +165,7 @@ public class CompilerUtil {
 				Iterable<JavaFileObject> result = super.list(location, packageName, kinds, recurse);
 
 				if((StandardLocation.CLASS_PATH).equals(location) && kinds.contains(JavaFileObject.Kind.CLASS)){
-					Collection<ClassPathClassFileObject> classLoaderObjects = listClassObjects(packageName, recurse);
+					Collection<ClassPathClassFileObject> classLoaderObjects = listClassFileObjects(packageName.replace('/', '.'), recurse);
 
 					if(classLoaderObjects.size() > 0){
 						result = Iterables.concat(result, classLoaderObjects);
@@ -187,9 +188,23 @@ public class CompilerUtil {
 			}
 
 			@Override
+			public JavaFileObject getJavaFileForInput(JavaFileManager.Location location, String name, Kind kind) throws IOException {
+
+				if((StandardLocation.CLASS_PATH).equals(location) && (JavaFileObject.Kind.CLASS).equals(kind)){
+					ClassPathClassFileObject classLoaderObject = getClassFileObject(name.replace('/', '.'));
+
+					if(classLoaderObject != null){
+						return classLoaderObject;
+					}
+				}
+
+				return super.getJavaFileForInput(location, name, kind);
+			}
+
+			@Override
 			public JavaFileObject getJavaFileForOutput(JavaFileManager.Location location, String name, JavaFileObject.Kind kind, FileObject sibling) throws IOException {
 
-				if((JavaFileObject.Kind.CLASS).equals(kind)){
+				if((StandardLocation.CLASS_OUTPUT).equals(location) && (JavaFileObject.Kind.CLASS).equals(kind)){
 					ByteArrayClassFileObject classObject = new ByteArrayClassFileObject(name);
 
 					classObjects.add(classObject);
@@ -200,8 +215,8 @@ public class CompilerUtil {
 				return super.getJavaFileForOutput(location, name, kind, sibling);
 			}
 
-			private Collection<ClassPathClassFileObject> listClassObjects(String packageName, boolean recurse) throws IOException {
-				List<ClassPathClassFileObject> result = new ArrayList<>();
+			private Collection<ClassPathClassFileObject> listClassFileObjects(String packageName, boolean recurse) throws IOException {
+				ClassPath classPath = getClassPath();
 
 				Predicate<ClassPath.ClassInfo> filter = new Predicate<ClassPath.ClassInfo>(){
 
@@ -216,16 +231,33 @@ public class CompilerUtil {
 					}
 				};
 
-				ClassPath classPath = getClassPath();
+				List<ClassPathClassFileObject> result = new ArrayList<>();
 
 				Iterable<ClassPath.ClassInfo> classInfos = Iterables.filter(classPath.getAllClasses(), filter);
 				for(ClassPath.ClassInfo classInfo : classInfos){
-					ClassPathClassFileObject classObject = new ClassPathClassFileObject(classInfo);
-
-					result.add(classObject);
+					result.add(new ClassPathClassFileObject(classInfo));
 				}
 
 				return result;
+			}
+
+			private ClassPathClassFileObject getClassFileObject(String name) throws IOException {
+				ClassPath classPath = getClassPath();
+
+				Predicate<ClassPath.ClassInfo> filter = new Predicate<ClassPath.ClassInfo>(){
+
+					@Override
+					public boolean apply(ClassPath.ClassInfo classInfo){
+						return (classInfo.getName()).equals(name);
+					}
+				};
+
+				ClassPath.ClassInfo classInfo = Iterables.find(classPath.getAllClasses(), filter, null);
+				if(classInfo != null){
+					return new ClassPathClassFileObject(classInfo);
+				}
+
+				return null;
 			}
 
 			private ClassPath getClassPath() throws IOException {
