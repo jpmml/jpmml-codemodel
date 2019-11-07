@@ -9,7 +9,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
@@ -21,10 +23,13 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
-import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.SetMultimap;
 import com.google.common.io.ByteStreams;
 import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.Reflection;
 import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JPackage;
@@ -157,7 +162,7 @@ public class CompilerUtil {
 	private JavaFileManager createClassObjectJavaFileManager(StandardJavaFileManager standardFileManager, ClassLoader classLoader, List<ByteArrayClassFileObject> classObjects){
 		JavaFileManager fileManager = new ForwardingJavaFileManager<StandardJavaFileManager>(standardFileManager){
 
-			private ClassPath classPath = null;
+			private SetMultimap<String, ClassPath.ClassInfo> classPathMap = null;
 
 
 			@Override
@@ -216,57 +221,55 @@ public class CompilerUtil {
 			}
 
 			private Collection<ClassPathClassFileObject> listClassFileObjects(String packageName, boolean recurse) throws IOException {
-				ClassPath classPath = getClassPath();
+				SetMultimap<String, ClassPath.ClassInfo> classPathMap = getClassPathMap();
 
-				Predicate<ClassPath.ClassInfo> filter = new Predicate<ClassPath.ClassInfo>(){
+				Collection<? extends Map.Entry<String, Collection<ClassPath.ClassInfo>>> entries = (classPathMap.asMap()).entrySet();
 
-					@Override
-					public boolean apply(ClassPath.ClassInfo classInfo){
-
-						if(recurse){
-							return (classInfo.getName()).startsWith(packageName + ".");
-						}
-
-						return (classInfo.getPackageName()).equals(packageName);
-					}
-				};
-
-				List<ClassPathClassFileObject> result = new ArrayList<>();
-
-				Iterable<ClassPath.ClassInfo> classInfos = Iterables.filter(classPath.getAllClasses(), filter);
-				for(ClassPath.ClassInfo classInfo : classInfos){
-					result.add(new ClassPathClassFileObject(classInfo));
-				}
+				Set<ClassPathClassFileObject> result = entries.stream()
+					.filter(entry -> recurse ? (entry.getKey()).startsWith(packageName + ".") : (entry.getKey()).equals(packageName))
+					.flatMap(entry -> (entry.getValue()).stream())
+					.map(classInfo -> new ClassPathClassFileObject(classInfo))
+					.collect(Collectors.toSet());
 
 				return result;
 			}
 
 			private ClassPathClassFileObject getClassFileObject(String name) throws IOException {
-				ClassPath classPath = getClassPath();
+				SetMultimap<String, ClassPath.ClassInfo> classPathMap = getClassPathMap();
 
-				Predicate<ClassPath.ClassInfo> filter = new Predicate<ClassPath.ClassInfo>(){
+				Set<ClassPath.ClassInfo> classInfos = classPathMap.get(Reflection.getPackageName(name));
+				if(classInfos != null){
+					ClassPathClassFileObject result = classInfos.stream()
+						.filter(classInfo -> (classInfo.getName()).equals(name))
+						.map(classInfo -> new ClassPathClassFileObject(classInfo))
+						.findFirst().orElse(null);
 
-					@Override
-					public boolean apply(ClassPath.ClassInfo classInfo){
-						return (classInfo.getName()).equals(name);
-					}
-				};
-
-				ClassPath.ClassInfo classInfo = Iterables.find(classPath.getAllClasses(), filter, null);
-				if(classInfo != null){
-					return new ClassPathClassFileObject(classInfo);
+					return result;
 				}
 
 				return null;
 			}
 
-			private ClassPath getClassPath() throws IOException {
+			private SetMultimap<String, ClassPath.ClassInfo> getClassPathMap() throws IOException {
 
-				if(this.classPath == null){
-					this.classPath = ClassPath.from(classLoader);
+				if(this.classPathMap == null){
+					this.classPathMap = createClassPathMap();
 				}
 
-				return this.classPath;
+				return this.classPathMap;
+			}
+
+			private SetMultimap<String, ClassPath.ClassInfo> createClassPathMap() throws IOException {
+				ClassPath classPath = ClassPath.from(classLoader);
+
+				ImmutableSetMultimap.Builder<String, ClassPath.ClassInfo> resultBuilder = ImmutableSetMultimap.builder();
+
+				ImmutableSet<ClassPath.ClassInfo> classInfos = classPath.getAllClasses();
+				for(ClassPath.ClassInfo classInfo : classInfos){
+					resultBuilder.put(Reflection.getPackageName(classInfo.getName()), classInfo);
+				}
+
+				return resultBuilder.build();
 			}
 		};
 
