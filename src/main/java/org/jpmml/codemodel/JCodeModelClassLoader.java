@@ -190,4 +190,8 @@ public class JCodeModelClassLoader extends ClassLoader {
 			os.close();
 		}
 	}
+
+	static {
+		ClassLoader.registerAsParallelCapable();
+	}
 }
