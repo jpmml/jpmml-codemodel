@@ -5,6 +5,7 @@ package org.jpmml.codemodel;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 import com.google.common.reflect.ClassPath;
 
@@ -14,7 +15,7 @@ public class ClassPathClassFileObject extends ClassFileObject {
 
 
 	public ClassPathClassFileObject(ClassPath.ClassInfo classInfo){
-		super("classpath", classInfo.getName());
+		super("classpath", classInfo != null ? classInfo.getName() : null);
 
 		setClassInfo(classInfo);
 	}
@@ -37,6 +38,6 @@ public class ClassPathClassFileObject extends ClassFileObject {
 	}
 
 	private void setClassInfo(ClassPath.ClassInfo classInfo){
-		this.classInfo = classInfo;
+		this.classInfo = Objects.requireNonNull(classInfo);
 	}
 }

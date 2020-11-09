@@ -4,6 +4,7 @@
 package org.jpmml.codemodel;
 
 import java.net.URI;
+import java.util.Objects;
 
 import javax.tools.SimpleJavaFileObject;
 
@@ -11,7 +12,7 @@ abstract
 public class ClassFileObject extends SimpleJavaFileObject {
 
 	public ClassFileObject(String scheme, String name){
-		super(URI.create(scheme + ":///" + name.replace('.', '/') + ".class"), Kind.CLASS);
+		super(URI.create(Objects.requireNonNull(scheme) + ":///" + toClassFileName(Objects.requireNonNull(name))), Kind.CLASS);
 	}
 
 	/**
@@ -65,5 +66,10 @@ public class ClassFileObject extends SimpleJavaFileObject {
 		}
 
 		return packageName.replace('/', '.');
+	}
+
+	static
+	private String toClassFileName(String name){
+		return name.replace('.', '/') + ".class";
 	}
 }

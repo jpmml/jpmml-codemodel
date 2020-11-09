@@ -6,6 +6,7 @@ package org.jpmml.codemodel;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Objects;
 
 import javax.tools.SimpleJavaFileObject;
 
@@ -27,7 +28,7 @@ public class StringSourceFileObject extends SimpleJavaFileObject {
 	}
 
 	public StringSourceFileObject(String name, String encoding){
-		super(URI.create("string:///" + name), Kind.SOURCE);
+		super(URI.create("string:///" + Objects.requireNonNull(name)), Kind.SOURCE);
 
 		setEncoding(encoding);
 	}

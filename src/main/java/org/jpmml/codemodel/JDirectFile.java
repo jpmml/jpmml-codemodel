@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 
 import com.google.common.io.ByteStreams;
 import com.sun.codemodel.JResourceFile;
@@ -45,6 +46,6 @@ public class JDirectFile extends JResourceFile implements Streamable {
 	}
 
 	private void setFile(File file){
-		this.file = file;
+		this.file = Objects.requireNonNull(file);
 	}
 }

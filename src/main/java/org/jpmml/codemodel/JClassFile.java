@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 
 import com.sun.codemodel.JResourceFile;
 
@@ -40,6 +41,6 @@ public class JClassFile extends JResourceFile implements Streamable {
 	}
 
 	private void setBytes(byte[] bytes){
-		this.bytes = bytes;
+		this.bytes = Objects.requireNonNull(bytes);
 	}
 }

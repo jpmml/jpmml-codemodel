@@ -16,6 +16,7 @@ import java.net.URLStreamHandler;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Objects;
 
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JPackage;
@@ -153,7 +154,7 @@ public class JCodeModelClassLoader extends ClassLoader {
 	}
 
 	private void setCodeModel(JCodeModel codeModel){
-		this.codeModel = codeModel;
+		this.codeModel = Objects.requireNonNull(codeModel);
 	}
 
 	static

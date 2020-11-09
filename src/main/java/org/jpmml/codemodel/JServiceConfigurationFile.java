@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.ServiceLoader;
 
 import com.sun.codemodel.JResourceFile;
@@ -24,7 +25,7 @@ public class JServiceConfigurationFile extends JResourceFile {
 
 
 	public JServiceConfigurationFile(JType service, Collection<? extends JType> serviceProviders){
-		super(service.binaryName());
+		super(service != null ? service.binaryName() : null);
 
 		setService(service);
 		setServiceProviders(serviceProviders);
@@ -53,7 +54,7 @@ public class JServiceConfigurationFile extends JResourceFile {
 	}
 
 	private void setService(JType service){
-		this.service = service;
+		this.service = Objects.requireNonNull(service);
 	}
 
 	public Collection<? extends JType> getServiceProviders(){
@@ -61,6 +62,6 @@ public class JServiceConfigurationFile extends JResourceFile {
 	}
 
 	private void setServiceProviders(Collection<? extends JType> serviceProviders){
-		this.serviceProviders = serviceProviders;
+		this.serviceProviders = Objects.requireNonNull(serviceProviders);
 	}
 }
