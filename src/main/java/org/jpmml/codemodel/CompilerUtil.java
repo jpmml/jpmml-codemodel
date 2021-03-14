@@ -27,7 +27,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.SetMultimap;
-import com.google.common.io.ByteStreams;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.Reflection;
 import com.sun.codemodel.CodeWriter;
@@ -143,17 +142,7 @@ public class CompilerUtil {
 
 	static
 	private CodeWriter createResourceCodeWriter(){
-		CodeWriter codeWriter = new CodeWriter(){
-
-			@Override
-			public OutputStream openBinary(JPackage _package, String name){
-				return ByteStreams.nullOutputStream();
-			}
-
-			@Override
-			public void close(){
-			}
-		};
+		CodeWriter codeWriter = new NullCodeWriter();
 
 		return codeWriter;
 	}
