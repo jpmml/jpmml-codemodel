@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
+import javax.tools.DiagnosticListener;
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaCompiler;
@@ -42,11 +42,11 @@ public class CompilerUtil {
 
 	static
 	public void compile(JCodeModel codeModel) throws IOException {
-		compile(codeModel, null, null);
+		compile(codeModel, null, null, null);
 	}
 
 	static
-	public void compile(JCodeModel codeModel, JavaCompiler compiler, ClassLoader classLoader) throws IOException {
+	public void compile(JCodeModel codeModel, JavaCompiler compiler, DiagnosticListener<? super JavaFileObject> diagnosticListener, ClassLoader classLoader) throws IOException {
 
 		if(compiler == null){
 			compiler = ToolProvider.getSystemJavaCompiler();
@@ -54,6 +54,10 @@ public class CompilerUtil {
 			if(compiler == null){
 				throw new IOException();
 			}
+		} // End if
+
+		if(diagnosticListener == null){
+			diagnosticListener = new DiagnosticCollector<>();
 		} // End if
 
 		if(classLoader == null){
@@ -70,19 +74,12 @@ public class CompilerUtil {
 
 		codeModel.build(sourceWriter, resourceWriter);
 
-		DiagnosticCollector<? super JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
-
 		boolean success;
 
-		try(StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnosticCollector, null, null)){
+		try(StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnosticListener, null, null)){
 
 			try(JavaFileManager classObjectFileManager = createClassObjectJavaFileManager(standardFileManager, classLoader, classObjects)){
-				JavaCompiler.CompilationTask task = compiler.getTask(null, classObjectFileManager, diagnosticCollector, null, null, sourceObjects);
-
-				List<Diagnostic<?>> diagnostics = (List)diagnosticCollector.getDiagnostics();
-				for(Diagnostic<?> diagnostic : diagnostics){
-					System.err.println(diagnostic);
-				}
+				JavaCompiler.CompilationTask task = compiler.getTask(null, classObjectFileManager, diagnosticListener, null, null, sourceObjects);
 
 				success = task.call();
 			}

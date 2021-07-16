@@ -75,7 +75,7 @@ public class CodeModelTest {
 		};
 
 		try(URLClassLoader classLoader = new URLClassLoader(classpath)){
-			CompilerUtil.compile(derivedCodeModel, new EclipseCompiler(), classLoader);
+			CompilerUtil.compile(derivedCodeModel, new EclipseCompiler(), null, classLoader);
 		}
 
 		boolean success = file.delete();
