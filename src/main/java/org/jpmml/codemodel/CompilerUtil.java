@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaCompiler;
@@ -65,12 +67,19 @@ public class CompilerUtil {
 
 		codeModel.build(sourceWriter, resourceWriter);
 
+		DiagnosticCollector<? super JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
+
 		boolean success;
 
-		try(StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(null, null, null)){
+		try(StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnosticCollector, null, null)){
 
 			try(JavaFileManager classObjectFileManager = createClassObjectJavaFileManager(standardFileManager, classLoader, classObjects)){
-				JavaCompiler.CompilationTask task = compiler.getTask(null, classObjectFileManager, null, null, null, sourceObjects);
+				JavaCompiler.CompilationTask task = compiler.getTask(null, classObjectFileManager, diagnosticCollector, null, null, sourceObjects);
+
+				List<Diagnostic<?>> diagnostics = (List)diagnosticCollector.getDiagnostics();
+				for(Diagnostic<?> diagnostic : diagnostics){
+					System.err.println(diagnostic);
+				}
 
 				success = task.call();
 			}
