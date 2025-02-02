@@ -10,7 +10,7 @@
 
 	<groupId>org.jpmml</groupId>
 	<artifactId>jpmml-codemodel</artifactId>
-	<version>1.2.0</version>
+	<version>1.2-SNAPSHOT</version>
 
 	<name>JPMML-CodeModel</name>
 	<description>Java utilities for generating, compiling and packaging Java application code</description>
@@ -35,7 +35,7 @@
 		<connection>scm:git:git@github.com:jpmml/jpmml-codemodel.git</connection>
 		<developerConnection>scm:git:git@github.com:jpmml/jpmml-codemodel.git</developerConnection>
 		<url>git://github.com/jpmml/jpmml-codemodel.git</url>
-		<tag>1.2.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
@@ -44,7 +44,7 @@
 
 	<properties>
 		<jdk.version>11</jdk.version>
-		<project.build.outputTimestamp>2025-02-02T18:56:32Z</project.build.outputTimestamp>
+		<project.build.outputTimestamp>2025-02-02T18:56:48Z</project.build.outputTimestamp>
 	</properties>
 
 	<dependencies>
