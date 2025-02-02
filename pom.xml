@@ -69,6 +69,7 @@
 		<dependency>
 			<groupId>org.eclipse.jdt</groupId>
 			<artifactId>ecj</artifactId>
+			<!-- The last JDK 11 compatible version -->
 			<version>3.33.0</version>
 			<scope>test</scope>
 		</dependency>
@@ -173,4 +174,20 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<activation>
+				<jdk>[17,)</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.eclipse.jdt</groupId>
+					<artifactId>ecj</artifactId>
+					<version>3.40.0</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>
