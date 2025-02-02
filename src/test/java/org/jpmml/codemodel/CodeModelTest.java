@@ -13,6 +13,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import javax.tools.JavaCompiler;
+
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JBlock;
@@ -33,11 +35,23 @@ public class CodeModelTest {
 
 	@Test
 	public void compileAndArchive() throws Exception {
+		compileAndArchive(null);
+		compileAndArchive(new EclipseCompiler());
+	}
+
+	@Test
+	public void compileAndLoad() throws Exception {
+		compileAndLoad(null);
+		compileAndLoad(new EclipseCompiler());
+	}
+
+	static
+	private void compileAndArchive(JavaCompiler compiler) throws Exception {
 		JCodeModel codeModel = new JCodeModel();
 
 		generateExampleApplication(codeModel, "example.Main");
 
-		CompilerUtil.compile(codeModel);
+		CompilerUtil.compile(codeModel, compiler, null, null);
 
 		File file = File.createTempFile("codemodel", ".jar");
 
@@ -75,7 +89,7 @@ public class CodeModelTest {
 		};
 
 		try(URLClassLoader classLoader = new URLClassLoader(classpath)){
-			CompilerUtil.compile(derivedCodeModel, new EclipseCompiler(), null, classLoader);
+			CompilerUtil.compile(derivedCodeModel, compiler, null, classLoader);
 		}
 
 		boolean success = file.delete();
@@ -83,13 +97,13 @@ public class CodeModelTest {
 		assertTrue(success);
 	}
 
-	@Test
-	public void compileAndLoad() throws Exception {
+	static
+	private void compileAndLoad(JavaCompiler compiler) throws Exception {
 		JCodeModel codeModel = new JCodeModel();
 
 		generateExampleApplication(codeModel, "example.Main");
 
-		CompilerUtil.compile(codeModel);
+		CompilerUtil.compile(codeModel, compiler, null, null);
 
 		ClassLoader classLoader = new JCodeModelClassLoader(codeModel);
 

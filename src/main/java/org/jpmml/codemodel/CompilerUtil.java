@@ -7,9 +7,12 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -77,9 +80,10 @@ public class CompilerUtil {
 		boolean success;
 
 		try(StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnosticListener, null, null)){
+			standardFileManager.setLocation(StandardLocation.SOURCE_PATH, Collections.emptyList());
 
 			try(JavaFileManager classObjectFileManager = createClassObjectJavaFileManager(standardFileManager, classLoader, classObjects)){
-				JavaCompiler.CompilationTask task = compiler.getTask(null, classObjectFileManager, diagnosticListener, null, null, sourceObjects);
+				JavaCompiler.CompilationTask task = compiler.getTask(null, classObjectFileManager, diagnosticListener, CompilerUtil.options, null, sourceObjects);
 
 				success = task.call();
 			}
@@ -105,6 +109,14 @@ public class CompilerUtil {
 
 			_package.addResourceFile(classFile);
 		}
+	}
+
+	public Iterable<String> getOptions(){
+		return CompilerUtil.options;
+	}
+
+	public void setOptions(Iterable<String> options){
+		CompilerUtil.options = Objects.requireNonNull(options);
 	}
 
 	static
@@ -162,6 +174,17 @@ public class CompilerUtil {
 
 			private SetMultimap<String, ClassPath.ClassInfo> classPathMap = null;
 
+
+			@Override
+			public boolean contains(Location location, FileObject fileObject) throws IOException {
+				boolean result = super.contains(location, fileObject);
+
+				if((StandardLocation.SOURCE_PATH).equals(location)){
+					return (fileObject instanceof StringSourceFileObject);
+				}
+
+				return result;
+			}
 
 			@Override
 			public Iterable<JavaFileObject> list(JavaFileManager.Location location, String packageName, Set<JavaFileObject.Kind> kinds, boolean recurse) throws IOException {
@@ -273,4 +296,6 @@ public class CompilerUtil {
 
 		return fileManager;
 	}
+
+	private static Iterable<String> options = Arrays.asList("-source", "11", "-target", "11");
 }
