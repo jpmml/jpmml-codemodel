@@ -43,6 +43,9 @@
 	</issueManagement>
 
 	<properties>
+		<guava.version>[21.0,)</guava.version>
+		<glassfish-codemodel.version>4.0.5</glassfish-codemodel.version>
+		<ecj.version>3.40.0</ecj.version>
 		<project.build.outputTimestamp>2025-02-02T18:56:48Z</project.build.outputTimestamp>
 	</properties>
 
@@ -50,7 +53,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>[21.0,)</version>
+			<version>${guava.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -62,14 +65,13 @@
 		<dependency>
 			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>codemodel</artifactId>
-			<version>4.0.5</version>
+			<version>${glassfish-codemodel.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.eclipse.jdt</groupId>
 			<artifactId>ecj</artifactId>
-			<!-- The last JDK 11 compatible version -->
-			<version>3.33.0</version>
+			<version>${ecj.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -82,16 +84,13 @@
 	<profiles>
 		<profile>
 			<activation>
-				<jdk>[17,)</jdk>
+				<jdk>11</jdk>
 			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.eclipse.jdt</groupId>
-					<artifactId>ecj</artifactId>
-					<version>3.40.0</version>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
+
+			<properties>
+				<!-- The last JDK 11 compatible version -->
+				<ecj.version>3.33.0</ecj.version>
+			</properties>
 		</profile>
 	</profiles>
 </project>
