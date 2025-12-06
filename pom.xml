@@ -44,7 +44,7 @@
 
 	<properties>
 		<guava.version>[21.0,)</guava.version>
-		<glassfish-codemodel.version>4.0.5</glassfish-codemodel.version>
+		<glassfish-codemodel.version>4.0.6</glassfish-codemodel.version>
 		<ecj.version>3.40.0</ecj.version>
 		<project.build.outputTimestamp>2025-02-02T18:56:48Z</project.build.outputTimestamp>
 	</properties>
