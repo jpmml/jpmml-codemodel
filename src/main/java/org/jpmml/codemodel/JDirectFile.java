@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 
-import com.google.common.io.ByteStreams;
 import com.sun.codemodel.JResourceFile;
 
 public class JDirectFile extends JResourceFile implements Streamable {
@@ -28,7 +27,7 @@ public class JDirectFile extends JResourceFile implements Streamable {
 	public void build(OutputStream os) throws IOException {
 
 		try(InputStream is = getInputStream()){
-			ByteStreams.copy(is, os);
+			is.transferTo(os);
 		}
 
 		os.flush();
